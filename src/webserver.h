@@ -2,6 +2,7 @@
 #include <ESP8266httpUpdate.h>
 #elif defined ARDUINO_ARCH_ESP32
 #include <Update.h>
+#include <SPIFFS.h>
 #endif
 
 #include <ArduinoJson.h> // 6.9.0 or later
@@ -190,6 +191,21 @@ void handle_root() {
     message.replace(F("PM2.5: {colorAveragePM25} {averagePM25} µg/m³"), "");
     message.replace(F("PM10: {colorAveragePM10} {averagePM10} µg/m³"), "");
   }
+  
+  if (SECOND_THP) {
+    if (!strcmp(SECOND_THP_MODEL, "BME280")) {
+      message += FPSTR(WEB_ROOT_PAGE_MEASUREMENTS_THP2);
+      message.replace(F("{TEXT_TEMPERATURE}"), (TEXT_TEMPERATURE));
+      message.replace(F("{TEXT_HUMIDITY}"), (TEXT_HUMIDITY));
+      message.replace(F("{TEXT_PRESSURE}"), (TEXT_PRESSURE));
+      message.replace(F("{TEXT_DEWPOINT}"), (TEXT_DEWPOINT));
+
+      message.replace(F("{Temperature}"), String(int(currentTemperature_THP2)));
+      message.replace(F("{Pressure}"), String(int(currentPressure_THP2)));
+      message.replace(F("{Humidity}"), String(int(currentHumidity_THP2)));
+      message.replace(F("{Dewpoint}"), String(int(pow((currentHumidity_THP2) / 100, 0.125) * (112 + 0.9 * (currentTemperature_THP2)) + 0.1 * (currentTemperature_THP2) - 112)));
+    }
+  }
 
   if (AIRMONITOR_GRAPH_ON) {
     message += FPSTR(WEB_ROOT_PAGE_AIRMONITOR_GRAPH);
@@ -340,6 +356,26 @@ String _addModelSelect(const String &key, const String &value) {
 }
 
 String _addTHP_MODELSelect(const String &key, const String &value) {
+  String input = FPSTR(WEB_CONFIG_PAGE_SELECT);
+  input.replace("{key}", key);
+  input += _addOption("BME280", "BME280", value);
+  if (strcmp(PMSENSORVERSION, "PMS-SparkFunBME280")) {
+    if (!strcmp(DUST_MODEL, "PMS7003") or !strcmp(DUST_MODEL, "Non")) {
+      input += _addOption("BME280-SparkFun", "BME280-SparkFun", value);
+    }
+  }
+  input += _addOption("SHT1x", "SHT1x", value);
+  input += _addOption("HTU21", "SHT21/HTU21D", value);
+  input += _addOption("DHT22", "DHT22", value);
+  input += _addOption("BMP280", "BMP280", value);
+  input += _addOption("DS18B20", "DS18B20", value);
+
+  input += _addOption("Non", (TEXT_WITHOUTSENSOR), value);
+  input += FPSTR(WEB_CONFIG_PAGE_SELECTEND);
+  return input;
+}
+
+String _addSECOND_THP_MODELSelect(const String &key, const String &value) {
   String input = FPSTR(WEB_CONFIG_PAGE_SELECT);
   input.replace("{key}", key);
   input += _addOption("BME280", "BME280", value);
@@ -533,6 +569,12 @@ String _addRestoreConfig() {
   return RestoreConfig;
 }
 
+String _add_homekit_reset() {
+  String homekit_reset = FPSTR(WEB_CONFIG_PAGE_HOMEKIT_RESET);
+  homekit_reset.replace("{TEXT_PAGE_HOMEKIT_RESET}", (TEXT_PAGE_HOMEKIT_RESET));
+  return homekit_reset;
+}
+
 void handle_config() {
   String message = FPSTR(WEB_PAGE_HEADER);
   message.replace(F("{WEB_PAGE_CSS}"), FPSTR(WEB_PAGE_HEADER_CSS));
@@ -610,6 +652,7 @@ void _handle_config_device(bool is_success) {
   message.replace(F("{LanguageSelect}"), _addLanguageSelect("LANGUAGE", LANGUAGE));
   message.replace(F("{TEXT_TEMPHUMIPRESSSENSOR}"), (TEXT_TEMPHUMIPRESSSENSOR));
   message.replace(F("{THP_MODELSelect}"), _addTHP_MODELSelect("THP_MODEL", THP_MODEL));
+
   message.replace(F("{TEXT_PMSENSOR}"), (TEXT_PMSENSOR));
   message.replace(F("{DUST_MODELSelect}"), _addDUST_MODELSelect("DUST_MODEL", DUST_MODEL));
 
@@ -655,6 +698,13 @@ if(SECOND_THP) {
 	message.replace(F("{SECOND_THP_SCL}"), _add_SECOND_THP_SDA_SCL_Select("CONFIG_SECOND_THP_SCL", CONFIG_SECOND_THP_SCL));
 } else {
 	message.replace(F("{WEB_CONFIG_DEVICE_PAGE_SECOND_THP}"), "");
+}
+
+if(SECOND_THP) {
+	message.replace(F("{}"), "");
+	message.replace(F("{}"), "");
+} else {
+	message.replace(F("{}"), "");
 }
 
 message.replace(F("{TEXT_DUST_TX_RX}"), (TEXT_DUST_TX_RX));
@@ -737,6 +787,26 @@ message.replace(F("{DUST_RX}"), _add_DUST_TX_RX_Select("CONFIG_DUST_RX", CONFIG_
   message.replace(F("{TEXT_UPDATEPAGEAUTOUPDATEWARNING}"), TEXT_UPDATEPAGEAUTOUPDATEWARNING);
 #elif defined ARDUINO_ARCH_ESP32
   message.replace(F("{TEXT_UPDATEPAGEAUTOUPDATEWARNING}"), "");
+#endif
+  
+#ifdef ARDUINO_ARCH_ESP8266
+  message.replace(F("{TEXT_HOMEKIT_SUPPORT}"), "");
+  message.replace(F("{HOMEKIT_SUPPORT_ON}"), "");
+#elif defined ARDUINO_ARCH_ESP32
+  message.replace(F("{TEXT_HOMEKIT_SUPPORT}"), TEXT_HOMEKIT_SUPPORT);
+  message.replace(F("{HOMEKIT_SUPPORT_ON}"), _addBoolSelect("HOMEKIT_SUPPORT", HOMEKIT_SUPPORT));
+  if (HOMEKIT_SUPPORT == true) {
+      // Serial.println("homekit_is_paired: " + String(homekit_is_paired()));
+	  if (String(homekit_is_paired()) == "1") {
+		  message.replace(F("{TEXT_HOMEKIT_IS_PAIRED}"), (TEXT_HOMEKIT_IS_PAIRED));
+		  message.replace(F("{HOMEKIT_PAIRED_RESET}"), _add_homekit_reset());  
+	  } else {
+		  message.replace(F("<b>{TEXT_HOMEKIT_IS_PAIRED}: </b>{HOMEKIT_PAIRED_RESET}"), "");  		
+	  } 	
+  } else {
+	  message.replace(F("<b>{TEXT_HOMEKIT_IS_PAIRED}: </b>{HOMEKIT_PAIRED_RESET}"), "");  	
+  }
+	  
 #endif
 
   message.replace(F("{WiFiEraseButton}"), _addWiFiErase());
@@ -1378,6 +1448,7 @@ void handle_config_device_post() {
   char oldTHP_MODEL[32];
   strcpy(oldTHP_MODEL, THP_MODEL);
   _parseAsCString(THP_MODEL, WebServer.arg("THP_MODEL"), 32);
+  _parseAsCString(SECOND_THP_MODEL, WebServer.arg("SECOND_THP_MODEL"), 32);
 
   if (strcmp(THP_MODEL, oldTHP_MODEL) and !strcmp(THP_MODEL, "BME280-SparkFun")) {
     need_update = 1;
@@ -1469,6 +1540,10 @@ void handle_config_device_post() {
 
   _parseAsCString(MODEL, WebServer.arg("MODEL"), 32);
 
+
+  HOMEKIT_SUPPORT = _parseAsBool(WebServer.arg("HOMEKIT_SUPPORT"));
+
+
   if (DEBUG) {
     Serial.println(F("POST CONFIG END!!"));
   }
@@ -1540,6 +1615,8 @@ void handle_config_services_post() {
 
   _parseAsCString(LATITUDE, WebServer.arg("LATITUDE"), 16);
   _parseAsCString(LONGITUDE, WebServer.arg("LONGITUDE"), 16);
+  _parseAsCString(EMAIL, WebServer.arg("EMAIL"), 128);
+  
 
   THINGSPEAK_ON = _parseAsBool(WebServer.arg("THINGSPEAK_ON"));
   THINGSPEAK_GRAPH_ON = _parseAsBool(WebServer.arg("THINGSPEAK_GRAPH_ON"));
@@ -1828,4 +1905,64 @@ void handle_api() {
 
   serializeJsonPretty(json, message);
   WebServer.send(200, "text/json", message);
+}
+
+void homekit_reset() {
+    if (CONFIG_AUTH == true) {
+      if (!WebServer.authenticate(CONFIG_USERNAME, CONFIG_PASSWORD)) {
+        //return WebServer.requestAuthentication(BASIC_AUTH, www_realm, authFailResponse);
+        return WebServer.requestAuthentication(DIGEST_AUTH, www_realm, authFailResponse);
+      }
+    }
+  Serial.println("homekit reset...");
+
+  String pair_file_name = "/homekit_pair.dat";
+  SPIFFS.remove(pair_file_name);
+  
+  yield();
+  WebServer.sendHeader("Location", "/", true);
+  WebServer.send ( 302, "text/plain", "");
+  delay(1000);
+  Serial.println(F("Restart"));
+  ESP.restart();
+}
+
+void homekit_on() {
+    if (CONFIG_AUTH == true) {
+      if (!WebServer.authenticate(CONFIG_USERNAME, CONFIG_PASSWORD)) {
+        //return WebServer.requestAuthentication(BASIC_AUTH, www_realm, authFailResponse);
+        return WebServer.requestAuthentication(DIGEST_AUTH, www_realm, authFailResponse);
+      }
+    }
+  Serial.println("homekit on...");
+
+  HOMEKIT_SUPPORT = true;
+  saveConfig();
+
+  yield();
+  WebServer.sendHeader("Location", "/", true);
+  WebServer.send ( 302, "text/plain", "");
+  delay(1000);
+  Serial.println(F("Restart"));
+  ESP.restart();
+}
+
+void homekit_off() {
+    if (CONFIG_AUTH == true) {
+      if (!WebServer.authenticate(CONFIG_USERNAME, CONFIG_PASSWORD)) {
+        //return WebServer.requestAuthentication(BASIC_AUTH, www_realm, authFailResponse);
+        return WebServer.requestAuthentication(DIGEST_AUTH, www_realm, authFailResponse);
+      }
+    }
+  Serial.println("homekit off...");
+
+  HOMEKIT_SUPPORT = false;
+  saveConfig();
+  
+  yield();
+  WebServer.sendHeader("Location", "/", true);
+  WebServer.send ( 302, "text/plain", "");
+  delay(1000);
+  Serial.println(F("Restart"));
+  ESP.restart();
 }

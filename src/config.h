@@ -11,6 +11,7 @@ extern char DUST_MODEL[32];
 extern bool FREQUENTMEASUREMENT;
 
 extern bool SECOND_THP;
+extern char SECOND_THP_MODEL[32];
 
 extern char CONFIG_FIRST_THP_SDA[8];
 extern char CONFIG_FIRST_THP_SCL[8];
@@ -37,6 +38,7 @@ extern bool AIRMONITOR_ON;
 extern bool AIRMONITOR_GRAPH_ON;
 extern char LATITUDE[16];
 extern char LONGITUDE[16];
+extern char EMAIL[128];
 extern int MYALTITUDE;
 
 extern bool THINGSPEAK_ON;
@@ -92,6 +94,11 @@ extern char CONFIG_PASSWORD[256];
 
 extern char MODEL[32];
 
+
+extern bool HOMEKIT_SUPPORT;
+const char HOMEKIT_PASSWORD[16] = "111-11-111";
+
+
 #ifdef DUSTSENSOR_PMS5003_7003_BME280_0x76 or DUSTSENSOR_PMS5003_7003_BME280_0x77
 const char PMSENSORVERSION[] = "PMS";
 #elif defined DUSTSENSOR_SDS011_21
@@ -107,10 +114,10 @@ const char PMSENSORVERSION[] = "PMS";
 extern char SERVERSOFTWAREVERSION[32];
 extern char CURRENTSOFTWAREVERSION[32];
 #if defined(ARDUINO_ARCH_ESP8266)
-const char SOFTWAREVERSION[] = "2.7.9 build " __TIME__ " " __DATE__;
+const char SOFTWAREVERSION[] = "2.8.0 build " __TIME__ " " __DATE__;
 const char HARDWAREVERSION[] = "1.0 - ESP8266";
 #elif defined(ARDUINO_ARCH_ESP32)
-const char SOFTWAREVERSION[] = "2.7.9 build " __TIME__ " " __DATE__;
+const char SOFTWAREVERSION[] = "2.8.0 build " __TIME__ " " __DATE__;
 const char HARDWAREVERSION[] = "2.0 - ESP32";
 
 #endif

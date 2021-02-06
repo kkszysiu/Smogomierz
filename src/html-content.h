@@ -94,9 +94,17 @@ const char WEB_ROOT_PAGE_MEASUREMENTS[] PROGMEM = R"rawliteral(<main role='main'
 	<h3>PM10: {colorAveragePM10} {averagePM10} µg/m³</h3>
 	)rawliteral";
 
+const char WEB_ROOT_PAGE_MEASUREMENTS_THP2[] PROGMEM = R"rawliteral(
+		<br><br>
+		<h3>{TEXT_TEMPERATURE}: {Temperature} °C</h3>
+		<h3>{TEXT_HUMIDITY}: {Humidity} %</h3>
+		<h3>{TEXT_PRESSURE}: {Pressure} hPa</h3>
+		<h3>{TEXT_DEWPOINT}: {Dewpoint} °C</h3><p>
+		)rawliteral";
+		
 const char WEB_ROOT_PAGE_AIRMONITOR_GRAPH[] PROGMEM = R"rawliteral(<hr>
-	<iframe src='http://metrics.airmonitor.pl:3000/dashboard-solo/db/airmonitor?orgId=1&var-latitude={LATITUDE}&var-longitude={LONGITUDE}&refresh=1m&panelId=14' frameborder='0' style='overflow: hidden; height: 100%; width: 100%; max-height: 510; max-width: 450;' ></iframe>
-	<iframe src='http://metrics.airmonitor.pl:3000/dashboard-solo/db/airmonitor?orgId=1&var-latitude={LATITUDE}&var-longitude={LONGITUDE}&refresh=1m&panelId=13' frameborder='0' style='overflow: hidden; height: 100%; width: 100%; max-height: 510; max-width: 450;' ></iframe>
+	<iframe src='http://metrics.airmonitor.pl/dashboard-solo/db/airmonitor?orgId=1&var-latitude={LATITUDE}&var-longitude={LONGITUDE}&refresh=1m&panelId=14' frameborder='0' style='overflow: hidden; height: 100%; width: 100%; max-height: 510; max-width: 450;' ></iframe>
+	<iframe src='http://metrics.airmonitor.pl/dashboard-solo/db/airmonitor?orgId=1&var-latitude={LATITUDE}&var-longitude={LONGITUDE}&refresh=1m&panelId=13' frameborder='0' style='overflow: hidden; height: 100%; width: 100%; max-height: 510; max-width: 450;' ></iframe>
 	)rawliteral";
 
 const char WEB_ROOT_PAGE_THINGSPEAK_GRAPH[] PROGMEM = R"rawliteral(<hr>
@@ -167,6 +175,8 @@ const char WEB_ROOT_PAGE_THINGSPEAK_GRAPH[] PROGMEM = R"rawliteral(<hr>
 
 	const char WEB_CONFIG_PAGE_WIFIERASE[] PROGMEM = "<a href='/erase_wifi' class='btn btn-outline-primary btn-sm' role='button'>{TEXT_ERASEWIFICONFIG}</a>";
 
+	const char WEB_CONFIG_PAGE_HOMEKIT_RESET[] PROGMEM = "<a href='/homekit_reset' class='btn btn-outline-primary btn-sm' role='button'>{TEXT_PAGE_HOMEKIT_RESET}</a>";
+
 	const char WEB_CONFIG_PAGE_RESTORECONFIG[] PROGMEM = "<a href='/restore_config' class='btn btn-outline-primary btn-sm' role='button'>{TEXT_RESTORESETTINGS}</a>";
 
 	const char WEB_CONFIG_TOP_PAGE_INFO[] PROGMEM = R"rawliteral(<center><div class='card text-white bg-success mb-3' style='max-width: 30rem;'>
@@ -209,9 +219,9 @@ const char WEB_CONFIG_DEVICE_PAGE_CONFIG[] PROGMEM = R"rawliteral(<b>{TEXT_DEVIC
 	<hr>{TEXT_FIRST_THP_SDA_SCL} - {THP_MODEL}<br>
 	<b>{TEXT_FIRST_THP_SDA}: </b>{FIRST_THP_SDA}
 	<b>{TEXT_FIRST_THP_SCL}: </b>{FIRST_THP_SCL}
-	<!-- <br>
+	<br>
 	<b>{TEXT_SECOND_THP}: </b>{SECOND_THP}
-	{WEB_CONFIG_DEVICE_PAGE_SECOND_THP} -->
+	{WEB_CONFIG_DEVICE_PAGE_SECOND_THP}
 	<br>{TEXT_DUST_TX_RX} - {DUST_MODEL}<br>
 	<b>{TEXT_DUST_TX}: </b>{DUST_TX}
 	<b>{TEXT_DUST_RX}: </b>{DUST_RX}
@@ -236,6 +246,9 @@ const char WEB_CONFIG_DEVICE_PAGE_CONFIG[] PROGMEM = R"rawliteral(<b>{TEXT_DEVIC
 	<!-- <b>{TEXT_CALIB2}: </b>{calib2} -->
 	<b>{TEXT_SOFTWATEVERSION}: </b>{SOFTWAREVERSION}
 	<br><b>{TEXT_AUTOUPDATEON}: </b>{AUTOUPDATEON} {TEXT_UPDATEPAGEAUTOUPDATEWARNING}
+	<br><b>{TEXT_HOMEKIT_SUPPORT}: </b>{HOMEKIT_SUPPORT_ON}
+	<b>{TEXT_HOMEKIT_IS_PAIRED}: </b>{HOMEKIT_PAIRED_RESET}
+	
 	<hr><center><br>
 	{WiFiEraseButton}  {RestoreConfigButton}
 	<br><br></center><hr><br><center>

@@ -154,6 +154,10 @@ extern char TEXT_CONNECTEDWIFI[28] = "Connected to a WiFi(SSID)";
 extern char TEXT_WIFIRSSI[28] = "WiFi Signal Strength(RSSI)";
 extern char TEXT_WIFIQUALITY[26] = "WiFi Signal Quality";
 
+extern char TEXT_HOMEKIT_SUPPORT[26] = "Apple HomeKit Support";
+extern char TEXT_HOMEKIT_IS_PAIRED[94] = "If you want to connect a new iOS/macOS device, you need to erase the current paired devices";
+extern char TEXT_PAGE_HOMEKIT_RESET[30] = "Delete the paired device";
+
 extern char TEXT_AIRQUALITY_TOPIC[12] = "Airquality";
 #ifdef ARDUINO_ARCH_ESP8266
 static char GITHUB_LINK[] = "<a title='Instructions' href='https://github.com/hackerspace-silesia/Smogomierz#instrukcje' target='_blank'>{TEXT_HERE}</a>";
@@ -174,7 +178,7 @@ static char LUFTDATEN_LINK[] = "<a title='LuftDaten.info' href='https://luftdate
 static char LUFTDATENFORM_LINK[] = "<a title='meine.luftdaten.info' href='https://meine.luftdaten.info' target='_blank'>meine.luftdaten.info</a>";
 static char SMOGLIST_LINK[] = "<a title='smoglist.pl' href='http://smoglist.pl' target='_blank'>Smoglist</a>";
 static char AIRMONITOR_LINK[] = "<a title='AirMonitor' href='http://mapa.airmonitor.pl' target='_blank'>AirMonitor</a>";
-static char AIRMONITORFORM_LINK[] = "<a title='AirMonitor Form' href='https://docs.google.com/forms/d/e/1FAIpQLSdw72_DggyrK7xnSQ1nR11Y-YK4FYWk_MF9QbecpOERql-T2w/viewform' target='_blank'>{TEXT_THEFORM}</a>";
+static char AIRMONITORFORM_LINK[] = "<a title='AirMonitor Form' href='https://airmonitor.pl/prod/station_registration' target='_blank'>{TEXT_THEFORM}</a>";
 static char LATLONG_LINK[] = "<a title='latlong.net' href='https://www.latlong.net' target='_blank'>{TEXT_HERE}</a>";
 static char THINGSPEAK_LINK[] = "<a title='ThingSpeak' href='https://thingspeak.com' target='_blank'>ThingSpeak</a>";
 static char SMOGOMIERZRELEASES_LINK[] = "<b><a target='_blank' href='https://github.com/hackerspace-silesia/Smogomierz/releases'>{TEXT_HERE}</a></b>";
